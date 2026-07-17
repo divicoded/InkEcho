@@ -168,10 +168,10 @@ export default function PoemDecor({ emotion, rgb, className = '' }: Props) {
               background: `radial-gradient(120% 70% at 50% 0%, rgba(${rgb},0.35), transparent 60%)`,
             }}
           />
-          <svg viewBox="0 0 240 40" className="absolute bottom-0 left-0 w-full text-indigo-300/40" preserveAspectRatio="none" fill="currentColor">
+          <svg viewBox="0 0 240 40" className="absolute bottom-0 left-0 w-[200%] text-indigo-300/40" preserveAspectRatio="none" fill="currentColor">
             <path className="decor-wave" d="M0 20 Q15 8 30 20 T60 20 T90 20 T120 20 T150 20 T180 20 T210 20 T240 20 V40 H0 Z" />
           </svg>
-          <svg viewBox="0 0 240 40" className="absolute bottom-1 left-0 w-full text-indigo-200/25" preserveAspectRatio="none" fill="currentColor">
+          <svg viewBox="0 0 240 40" className="absolute bottom-1 left-0 w-[200%] text-indigo-200/25" preserveAspectRatio="none" fill="currentColor">
             <path className="decor-wave-slow" d="M0 26 Q15 16 30 26 T60 26 T90 26 T120 26 T150 26 T180 26 T210 26 T240 26 V40 H0 Z" />
           </svg>
         </div>
