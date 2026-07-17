@@ -9,7 +9,7 @@ export default function Nav() {
       className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-5 sm:px-10"
     >
       <motion.a
-        href="/Poems/index.html"
+        href="Poems/index.html"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.7, ease: 'easeOut' }}
@@ -22,7 +22,7 @@ export default function Nav() {
         </span>
       </motion.a>
       <a
-        href="/Poems/index.html"
+        href="Poems/index.html"
         target="_blank"
         rel="noreferrer"
         data-cursor="hover"
