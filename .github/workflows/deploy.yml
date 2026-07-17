@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Deploy to GitHub Pages
 
 on:
@@ -34,6 +35,11 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Copy the original HTML prototype into the build so the in-app
+      # "archive" link (/Poems/index.html) resolves on the live site.
+      - name: Include Poems prototype
+        run: cp -r Poems dist/Poems
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
