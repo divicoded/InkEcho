@@ -1,0 +1,363 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cursor-size: 18px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: #050507;
+  color: #f5f5f7;
+  /* Use `clip` instead of `hidden` so we don't create a scroll container
+     that would break Lenis window-based smooth scrolling. */
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbars globally for immersion, keep scroll */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Lenis smooth-scroll baseline (required by the library) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* Animated mesh grid (inspired by the Poems/ wall) for subtle depth */
+.mesh-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 34px 34px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+  animation: meshMove 22s linear infinite;
+}
+
+@keyframes meshMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 34px 34px;
+  }
+}
+
+/* Cinematic noise overlay */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: var(--tw-noise, url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"));
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 60;
+  mix-blend-mode: overlay;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Gradient underline on poem-card titles (inspired by the Poems/ wall) */
+.poem-card-title {
+  display: inline-block;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.15)) 1;
+}
+
+.text-glow {
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.28);
+}
+
+/* Liquid-glass logo chip in the nav (inspired by the original Poems/ wall) */
+.liquid-logo {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(255, 255, 255, 0.08)
+  );
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 8px 30px -12px rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.liquid-logo:hover {
+  transform: translateY(-1px) scale(1.03);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 12px 40px -10px rgba(255, 255, 255, 0.4);
+}
+.liquid-logo-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 48%,
+    rgba(255, 255, 255, 0.05) 56%,
+    transparent 72%
+  );
+  transform: translateX(-120%);
+  animation: liquid-shine 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes liquid-shine {
+  0%,
+  60% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom cursor (desktop only) */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  transition: width 0.25s ease, height 0.25s ease, background 0.25s ease,
+    opacity 0.3s ease;
+  will-change: transform;
+}
+.custom-cursor.is-hover {
+  width: 46px;
+  height: 46px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none;
+  }
+}
+
+/* Dashed rotating ring used in ambient background */
+.dashed-border {
+  border-style: dashed !important;
+}
+
+/* Animated gradient shift for the hero title */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+.animate-gradient-shift {
+  animation: gradient-shift 6s ease-in-out infinite;
+}
+
+/* Shimmer sweep for the hero divider (inspired by the Poems/ header rule) */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+.animate-shimmer {
+  animation: shimmer 3.2s ease-in-out infinite;
+}
+
+/* react-bits style drifting meteors */
+@keyframes meteor-fall {
+  0% {
+    transform: translateY(-10%) translateX(0) rotate(215deg) scale(var(--s, 1));
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(120vh) translateX(-40vw) rotate(215deg) scale(var(--s, 1));
+    opacity: 0;
+  }
+}
+.meteor {
+  position: absolute;
+  width: 2px;
+  height: 70px;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85));
+  box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.35);
+  animation-name: meteor-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  opacity: 0;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .meteor {
+    display: none;
+  }
+}
+
+/* Per-emotion poem-card decorative sub-elements */
+@keyframes decor-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-8px) rotate(var(--r, 0deg));
+  }
+}
+.decor-float {
+  animation: decor-float 5s ease-in-out infinite;
+}
+@keyframes decor-twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+.decor-twinkle {
+  animation: decor-twinkle 3s ease-in-out infinite;
+}
+@keyframes decor-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.15);
+  }
+}
+.decor-pulse {
+  animation: decor-pulse 4s ease-in-out infinite;
+}
+@keyframes decor-drift {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+}
+.decor-drift {
+  animation: decor-drift 8s ease-in-out infinite;
+}
+@keyframes decor-wave {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.decor-wave {
+  animation: decor-wave 7s linear infinite;
+}
+.decor-wave-slow {
+  animation: decor-wave 11s linear infinite reverse;
+}
+
+/* On touch devices, reveal decor softly and disable hover-only glare */
+@media (pointer: coarse) {
+  .decor-float,
+  .decor-twinkle,
+  .decor-pulse,
+  .decor-drift {
+    animation-duration: 7s;
+  }
+}

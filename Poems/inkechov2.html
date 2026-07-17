@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An award-winning, immersive digital storytelling experience featuring fluid animations, glassmorphism, and atmospheric visual effects.">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="InkEcho | Cinematic Experience">
+    <meta property="og:description" content="Where ink becomes voice and voice becomes echo. An interactive anthology.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=2573&auto=format&fit=crop">
+    <meta name="theme-color" content="#0a0a0c">
+
+    <title>InkEcho | Cinematic Experience</title>
+    
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP for Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configuration for Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Montserrat"', 'sans-serif'],
+                    },
+                    colors: {
+                        midnight: {
+                            900: '#0a0a0c',
+                            800: '#141419',
+                            700: '#1f1f26',
+                        },
+                        paper: {
+                            50: '#fdfbf7',
+                            100: '#f7f3e8',
+                            200: '#efe6d5',
+                        },
+                        gold: {
+                            400: '#d4af37',
+                            500: '#c5a028',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles for Advanced Effects */
+        :root {
+            --cursor-size: 20px;
+        }
+
+        body {
+            transition: background-color 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), color 0.8s ease;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Smooth Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.5);
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .glass-panel {
+            background: rgba(10, 10, 12, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* Enhanced Card Styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            will-change: transform, box-shadow;
+            overflow: hidden; /* For inner glow containment */
+        }
+
+        .dark .glass-card {
+            background: rgba(30, 30, 35, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Dynamic Glow Layer on Cards */
+        .card-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            mix-blend-mode: soft-light;
+        }
+        
+        .dark .card-glow {
+            mix-blend-mode: overlay;
+        }
+
+        /* Text Gradients */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #111827 0%, #4b5563 100%);
+        }
+        
+        .dark .text-gradient {
+            background-image: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 100%);
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #0a0a0c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        /* Dynamic Background Layer */
+        #bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            transition: background 1.5s ease-in-out;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            mix-blend-mode: screen; /* Enhance glow effects */
+        }
+        .dark #bg-canvas {
+            mix-blend-mode: lighten;
+        }
+
+        /* Modal Transitions */
+        .modal-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content-wrapper {
+            transform: translateY(50px) scale(0.95);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .modal-overlay.active .modal-content-wrapper {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* Cursor Effect */
+        .custom-cursor {
+            width: var(--cursor-size);
+            height: var(--cursor-size);
+            border: 1px solid rgba(156, 163, 175, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease, opacity 0.3s ease;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            display: none;
+        }
+        @media (pointer: fine) {
+            .custom-cursor { display: block; }
+        }
+
+        p { margin-bottom: 1.5rem; }
+        
+        ::selection {
+            background: rgba(212, 175, 55, 0.3);
+            color: inherit;
+        }
+
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-paper-50 text-slate-800 dark:bg-midnight-900 dark:text-slate-200 transition-colors duration-700 selection:bg-gold-500/30">
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="text-center">
+            <h1 class="font-serif text-4xl text-white opacity-0 animate-[pulse_2s_ease-in-out_infinite]" id="loader-text">InkEcho</h1>
+            <div class="mt-4 w-32 h-0.5 bg-gray-800 rounded-full overflow-hidden mx-auto relative">
+                <div class="absolute inset-0 bg-white origin-left animate-[grow_1.5s_ease-in-out_forwards]"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Layers -->
+    <div id="bg-layer" class="bg-paper-50 dark:bg-midnight-900"></div>
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-40 px-6 py-6 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-end items-center">
+            <button id="theme-toggle" class="w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:scale-110 transition-transform duration-300 focus:outline-none group">
+                <i class="fas fa-moon text-lg group-hover:rotate-12 transition-transform dark:opacity-0 absolute"></i>
+                <i class="fas fa-sun text-lg text-yellow-300 group-hover:rotate-90 transition-transform opacity-0 dark:opacity-100 absolute"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <main class="relative z-10 w-full min-h-screen flex flex-col items-center">
+        
+        <!-- Hero Section -->
+        <header class="min-h-screen w-full flex flex-col justify-center items-center px-4 relative overflow-hidden">
+            <div class="text-center max-w-4xl mx-auto z-10">
+                <p class="font-sans text-xs md:text-sm tracking-[0.3em] uppercase mb-6 opacity-0 translate-y-4 animate-gsap-hero text-gold-500 font-semibold">
+                    Interactive Anthology
+                </p>
+                
+                <h1 class="font-serif text-6xl md:text-8xl lg:text-9xl font-bold leading-tight mb-8 opacity-0 translate-y-8 animate-gsap-hero tracking-tighter">
+                    <span class="block text-gradient">Ink Echo</span>
+                </h1>
+                
+                <div class="h-px w-24 bg-current mx-auto mb-8 opacity-0 scale-x-0 animate-gsap-hero-line"></div>
+                
+                <div class="font-serif text-xl md:text-3xl italic opacity-0 translate-y-4 animate-gsap-hero font-light text-slate-500 dark:text-slate-400">
+                    <p class="mb-2">“Where ink becomes voice and voice becomes echo.”</p>
+                    <p class="text-base md:text-xl text-slate-400 dark:text-slate-500 mt-4">
+                        Yet in my world... Ink becomes code, and code becomes story...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 opacity-0 animate-gsap-scroll flex flex-col items-center gap-2">
+                <span class="text-[10px] uppercase tracking-widest font-sans opacity-60">Scroll to Explore</span>
+                <div class="w-px h-16 bg-gradient-to-b from-current to-transparent"></div>
+            </div>
+        </header>
+
+        <!-- Poems Grid Section -->
+        <section id="poems-section" class="w-full max-w-7xl mx-auto px-6 py-24 md:py-32">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12" id="poems-grid">
+                <!-- Poems injected via JS -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="w-full py-12 text-center opacity-60 hover:opacity-100 transition-opacity duration-500 mb-8">
+            <p class="font-serif italic text-lg">Made with <span class="text-red-400">❤</span> by Div...</p>
+        </footer>
+
+    </main>
+
+    <!-- Fullscreen Modal -->
+    <div id="poem-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 backdrop-blur-xl bg-white/80 dark:bg-black/90">
+        
+        <!-- Modal Background Elements (Dynamic) -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div id="modal-blob-1" class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 transition-colors duration-700"></div>
+            <div id="modal-blob-2" class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2 transition-colors duration-700"></div>
+        </div>
+
+        <div class="modal-content-wrapper w-full max-w-2xl max-h-full relative glass-panel rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            
+            <!-- Modal Header -->
+            <div class="relative p-8 md:p-10 border-b border-white/10 shrink-0 z-10">
+                <button id="close-modal" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors duration-300 group z-20">
+                    <i class="fas fa-times text-xl text-slate-500 group-hover:text-slate-800 dark:group-hover:text-white transition-colors"></i>
+                </button>
+
+                <div class="flex items-center gap-4 mb-4">
+                    <span id="modal-category" class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors duration-300">Category</span>
+                    <span id="modal-date" class="font-sans text-xs text-slate-400 font-medium">Date</span>
+                </div>
+                
+                <h2 id="modal-title" class="font-serif text-3xl md:text-5xl font-bold text-gradient leading-tight pr-8">Title</h2>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-8 md:p-12 overflow-y-auto custom-scrollbar grow relative z-10">
+                <div id="modal-body" class="font-serif text-lg md:text-xl leading-relaxed whitespace-pre-line text-slate-700 dark:text-slate-300">
+                    <!-- Content -->
+                </div>
+                
+                <!-- Signature/End mark -->
+                <div class="mt-12 flex justify-center opacity-30">
+                    <i class="fas fa-feather-alt text-2xl"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // --- Embedded Data (GitHub Hosting Optimized) ---
+        const POEMS_DATA = [
+            {
+                "title": "Flicker Within",
+                "preview": "The light in his eyes once shimmered like dawn...",
+                "body": "The light in his eyes once shimmered like dawn,\nA pure, burning glow that could carry the stars on.\n\nBut the world, with its weight, slowly drew in so near,\nCasting shadows where brilliance had once been so clear.\n\nHe danced with the time, in a rhythm of grace,\nBut somewhere, somehow, he lost his own place.\nThe world whispered doubts, fed him fears through the years,\nTill the light in his eyes disappeared with his tears.\n\nYet in the quiet, a flicker remains,\nA strong, living spark that survives all the rains.\nFor though the world took his light far away,\nIt still lingers deep within, awaiting the day.",
+                "category": "Reflection",
+                "date": "2024-09-08",
+                "emotion": "depressed"
+            },
+            {
+                "title": "Moonlit Dreams",
+                "preview": "Under the moon's soft, silver gleam...",
+                "body": "Under the moon's soft, silver gleam,\nA world awakens in a quiet dream.\nI find myself in shadows deep,\nWhere secrets of the soul I keep.\n\nThe moon, a keeper of the old,\nWhispers tales that are untold.\nAnd in its tender, hallowed light,\nA new tomorrow dawns from night.",
+                "category": "Dreams",
+                "date": "2024-10-10",
+                "emotion": "dreams"
+            },
+            {
+                "title": "Khwaabon Ka Intezaar",
+                "preview": "Intezaar ke har lamhon mein usse paane ki ummeed hai...",
+                "body": "Intezaar ke har lamhon mein\nusse paane ki ummeed hai\nKhwaabon ka jaadoo usi pe chale\njo dil ke kareeb hai\n\nPaas ho kar bhi sach keh na sakein,\nAb yaadon mein yeh khwaab adhura sa lagne lage hain\nChahat aisi ki khwaabon mein uske saath rahein,\nPar khud pe aitbaar na tha, isliye hum khamosh rahe\n\nKehte hain khwaabon mein sochi hui baatein sach ho jaati hain,\nPar meri neendon ne un jhalakon ko kabhi mehsoos na kiya,\nRaat bhar teri tasveer aankhon tale\nhalki si parchhaayi chhod jaati hai,\nAur subah ki pehli kiran bhi\nbas nami ke saath khamosh ho jaati hai",
+                "category": "Love",
+                "date": "2025-05-01",
+                "emotion": "love"
+            },
+            {
+                "title": "Uski Parchhayi",
+                "preview": "Shaam dhalti thi uske naam pe, raatein uski baaton mein rehti...",
+                "body": "Shaam dhalti thi uske naam pe, raatein uski baaton mein rehti,\nChand bhi poochhta tha aksar, kiski kami thi jo aankhon mein nami rehti.\n\nZindagi chalte chalte kahin uske raaste pe ruk gayi thi,\nAur hum… har khushi mein uski parchhayi dhoondte chalte the.",
+                "category": "Longing",
+                "date": "2025-06-11",
+                "emotion": "nature"
+            },
+            {
+                "title": "Chhupi Hui Udaan",
+                "preview": "Kabhi Khwaabon mein jeeta, toh kabhi canvas rangin tha...",
+                "body": "Kabhi Khwaabon mein jeeta, toh kabhi canvas rangin tha,\nKuch alfaazon mein chhupi thi duniya, kuch sketch lines mein mann talleen tha.\nPadhne ka junoon tha, likhne ki aadat thi,\nUski muskurahat mein bhi kabhi apni chahat thi.\n\nLekin ab toh sab dhundhla sa lagta hai,\nDil ke kone mein bacha hua junoon bhi chhupa rehta hai.\nKabhi socha tha marks badhenge, log pehchaanenge kaam,\nPar na number badhe, na naam ...lagta hai, bekhaar gaye saare armaan.\n\nUmar toh keh rahi....\"abhi toh waqt hai udne ka,\"\nPar hausla kahin gira pada hai, khud se hi chhupa pada.",
+                "category": "Reflective",
+                "date": "2025-06-17",
+                "emotion": "depressed"
+            },
+            {
+                "title": "Maybe That Means Something",
+                "preview": "I used to smile like everything was fine....",
+                "body": "I used to smile like everything was fine....\nToo easy, like a coin flipped heads so often it forgot tails.\nWas that strength?\nSurvival?\nProbably both.\nProbably neither.\n\nI was the kid who stayed up late....\nNot for grades, not just for tests,\nBut because silence felt safer than sleep:\nThe hum of a fan, the glow of a screen,\nLines of code like small loyalties....\nI’d tweak, I’d tinker,\nNot to build the world, just to steady my hands.\n\nI made art in secret....\nSketches in the margins... whole lives in pencil.\nDrawing was breathing when the world got loud.\nAnd anime...\nWasn’t just comfort, it was recognition:\nUnderdogs who scarred and still stood,\nDreamers who bled and kept going,\nStories that said pain could mean something,\nThat love could be seen.\n\nI wasn’t special. Just quiet....\nQuiet can be loud in its own way.\nI had a little light, a private map,\nA version of me that still believed.\n\nThen came the decision:\nPCMB.... a stream on paper, a river I couldn’t hold,\nCurrents pulling, twisting, carving paths I didn’t know.\n\nI told myself I could carry it....\nPressure pooled like ink in veins,\nThick, slow, unstoppable,\nSeeping into every corner of me,\nWhispering the same small verdict: you’re not enough.\n\nEveryone else read numbers. Percentages. Proof.\nThey called it worth.... and walked away.\nNo one asked why my smile stopped reaching my eyes.\nIf someone had asked, I wouldn’t have known the words anyway.\n\nStopping felt like failure....\nFailure felt like erasing what little I had left.\nSo I kept going.... hollow and obedient.\n\nThen she came....\nShe didn’t know she was a soft war.\nSat beside me.... calm, warm, like a lullaby in a room of alarms.\nI didn’t want anything.\nJust proximity....\nJust presence....\nJust to exist in her orbit.\n\nI studied harder.... just to explain better,\nBecause when she said “thank you,”\nIt wasn’t small.... it was a lighthouse in my chest.\n\nShe didn’t save me.... she reminded me I could be seen.\nThat was enough to pull me back, for a moment.\n\nThen everything cracked.... The system shifted.\nPressure turned petty.... competition into cruelty.\nI poured time, mind, sleep, into the well.\nI broke things no one will ever see.\nAnd for what?\n\nI didn’t qualify....\nDidn’t pass the gate....\nDidn’t matter.\n\nShe kept moving.... bright, steady.... a star I could name but never touch.\nAnd I stayed.... behind.... in ink and in spirit.\nThe boy who painted in color now scrolls in grayscale.\nMy sketchbook.... once a universe.... gathers dust.\nI can’t finish an episode.... I watch winners and it hurts,\nBecause every victory is a mirror that says: not you.\n\nNow I float through days I don’t own....\nHours I can’t remember buying.\nI don’t live.... I pass time, like a ghost with a schedule.\nSilence isn’t quiet.... it’s a chorus that fills my chest,\nSays I’ve already lost.... maybe I was never enough.\n\nRegret is a shadow that learned to follow my footsteps....\nI should’ve spoken.... I should’ve guarded that smaller boy,\nThe one who felt too much and still chose to care.\n\nMirror me now.... hollow eyes, a candle burned low.\nOnce they burned.... now they only flicker.\nNo one’s coming to rescue me.... Not her, not a rewind, not a miracle.\nIt’s on me.... always was.... and that doesn’t make it easier.\n\nKnowing the load doesn’t lift it....\nWanting to rise doesn’t move tired legs....\nHope is heavy when hands can’t hold it....\nMemories coil like vines around my ribs....\nHer smile, the exams, the almosts, the what-ifs....\nThey tighten with every breath.\n\nAnd I keep asking.... quietly.... the same hard questions:\nCan I come back?\nCan I be enough again?\nCan I rebuild from this ruin?\nCan I forgive myself?\nDo I even want to?\n\nI don’t know.... Not yet.\nBut I am still here....\nAnd maybe.... maybe that means something.",
+                "category": "Reflective",
+                "date": "2025-08-05",
+                "emotion": "depressed"
+            },
+            {
+                "title": "Whispers of Autumn",
+                "preview": "The air grows crisp, the sun turns gold...",
+                "body": "The air grows crisp, the sun turns gold,\nA final story, softly told.\nEach leaf, a memory, breaks its hold,\nAnd whispers truths from seasons old.\nWe watch them fall, a silent cast,\nBelieving nothing beautiful can last.\n\nYet deep within this gentle fall,\nA different truth begins to call.\nThe quiet hope of what's to be,\nA lesson in mortality.\nFor spring awaits to set things right,\nAnd bring our spirits back to light.",
+                "category": "Nature",
+                "date": "2025-08-21",
+                "emotion": "nature"
+            }
+        ];
+
+        // State & Configuration
+        let isDarkMode = true;
+        let poems = [];
+        let sceneManager = null;
+
+        // --- Visual Theme Configuration ---
+        // Includes gradients (light/dark) and particle system configs
+        const categoryThemes = {
+            'Reflection': {
+                icon: 'fa-cloud',
+                accentClass: 'text-slate-400',
+                borderClass: 'border-slate-500/30',
+                glowColor: '148, 163, 184', 
+                blobColors: ['bg-slate-500/20', 'bg-gray-500/20'],
+                gradient: { light: 'linear-gradient(to bottom, #f1f5f9, #cbd5e1)', dark: 'linear-gradient(to bottom, #0f172a, #1e293b)' },
+                particleConfig: { type: 'mist', speed: 0.2, density: 40, colors: ['#94a3b8', '#cbd5e1'] }
+            },
+            'Reflective': { // Melancholy/Depressed
+                icon: 'fa-feather-alt',
+                accentClass: 'text-gray-400',
+                borderClass: 'border-gray-500/30',
+                glowColor: '156, 163, 175',
+                blobColors: ['bg-gray-700/20', 'bg-zinc-600/20'],
+                gradient: { light: 'linear-gradient(to bottom, #e2e8f0, #94a3b8)', dark: 'linear-gradient(to bottom, #09090b, #27272a)' },
+                particleConfig: { type: 'fragment', speed: 0.15, density: 50, colors: ['#52525b', '#71717a'] }
+            },
+            'Dreams': {
+                icon: 'fa-moon',
+                accentClass: 'text-indigo-400',
+                borderClass: 'border-indigo-500/30',
+                glowColor: '129, 140, 248',
+                blobColors: ['bg-indigo-500/20', 'bg-purple-600/20'],
+                gradient: { light: 'linear-gradient(to bottom, #e0e7ff, #c7d2fe)', dark: 'linear-gradient(to bottom, #1e1b4b, #312e81)' },
+                particleConfig: { type: 'star', speed: 0.1, density: 90, colors: ['#818cf8', '#c084fc', '#ffffff'] }
+            },
+            'Love': {
+                icon: 'fa-heart',
+                accentClass: 'text-rose-400',
+                borderClass: 'border-rose-500/30',
+                glowColor: '251, 113, 133',
+                blobColors: ['bg-rose-500/20', 'bg-red-500/20'],
+                gradient: { light: 'linear-gradient(to bottom, #ffe4e6, #fecdd3)', dark: 'linear-gradient(to bottom, #4c0519, #881337)' },
+                particleConfig: { type: 'heart', speed: 0.4, density: 35, colors: ['#fb7185', '#f43f5e'] }
+            },
+            'Nature': {
+                icon: 'fa-leaf',
+                accentClass: 'text-emerald-400',
+                borderClass: 'border-emerald-500/30',
+                glowColor: '52, 211, 153',
+                blobColors: ['bg-emerald-500/20', 'bg-teal-500/20'],
+                gradient: { light: 'linear-gradient(to bottom, #ecfdf5, #a7f3d0)', dark: 'linear-gradient(to bottom, #022c22, #064e3b)' },
+                particleConfig: { type: 'leaf', speed: 0.5, density: 45, colors: ['#34d399', '#10b981', '#fbbf24'] }
+            },
+            'Longing': {
+                icon: 'fa-wind',
+                accentClass: 'text-cyan-400',
+                borderClass: 'border-cyan-500/30',
+                glowColor: '34, 211, 238',
+                blobColors: ['bg-cyan-500/20', 'bg-sky-600/20'],
+                gradient: { light: 'linear-gradient(to bottom, #ecfeff, #bae6fd)', dark: 'linear-gradient(to bottom, #083344, #155e75)' },
+                particleConfig: { type: 'mist', speed: 0.5, density: 55, colors: ['#22d3ee', '#7dd3fc'] }
+            },
+            'default': {
+                icon: 'fa-pen-nib',
+                accentClass: 'text-gold-400',
+                borderClass: 'border-gold-500/30',
+                glowColor: '212, 175, 55',
+                blobColors: ['bg-blue-500/10', 'bg-purple-500/10'],
+                gradient: { light: '', dark: '' }, // Uses CSS default
+                particleConfig: { type: 'circle', speed: 0.3, density: 60, colors: ['#fbbf24', '#ffffff'] }
+            }
+        };
+
+        const getTheme = (cat) => categoryThemes[cat] || categoryThemes['default'];
+
+        // --- Core Functions ---
+
+        const init = async () => {
+            // Theme Setup
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                isDarkMode = savedTheme === 'dark';
+            } else {
+                isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            applyTheme();
+
+            // Load Data (Embedded)
+            poems = POEMS_DATA;
+            renderGrid();
+
+            // Init Engine
+            initAnimations();
+            sceneManager = new SceneManager();
+            
+            // Loading Sequence
+            setTimeout(() => {
+                document.getElementById('loader-text').style.opacity = '1';
+                setTimeout(() => {
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loader').style.display = 'none';
+                        triggerHeroAnimations();
+                    }, 800);
+                }, 1500);
+            }, 500);
+        };
+
+        const toggleTheme = () => {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            applyTheme();
+            // Update background if active scene
+            if(sceneManager) sceneManager.refreshBackground();
+        };
+
+        const applyTheme = () => {
+            const html = document.documentElement;
+            if (isDarkMode) html.classList.add('dark');
+            else html.classList.remove('dark');
+        };
+
+        const renderGrid = () => {
+            const grid = document.getElementById('poems-grid');
+            grid.innerHTML = poems.map((poem, index) => {
+                const theme = getTheme(poem.category);
+                const glowRgb = theme.glowColor; 
+                return `
+                <article 
+                    class="poem-card group relative glass-card rounded-xl p-8 cursor-pointer"
+                    data-index="${index}"
+                    data-category="${poem.category}"
+                    onclick="openModal(${index})"
+                    onmouseenter="handleCardEnter(this, '${glowRgb}')"
+                    onmousemove="handleCardTilt(event, this, '${glowRgb}')"
+                    onmouseleave="handleCardLeave(this)"
+                >
+                    <div class="card-glow" style="background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(${glowRgb}, 0.15), transparent 40%);"></div>
+                    
+                    <div class="relative z-10 flex flex-col h-full pointer-events-none">
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="text-[10px] font-bold uppercase tracking-widest ${theme.accentClass} border ${theme.borderClass} px-2 py-1 rounded transition-colors duration-300">
+                                ${poem.category}
+                            </span>
+                            <span class="font-serif italic text-slate-400 text-sm">
+                                ${new Date(poem.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                            </span>
+                        </div>
+                        
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold mb-4 text-slate-800 dark:text-slate-100 group-hover:${theme.accentClass} transition-colors duration-300">
+                            ${poem.title}
+                        </h3>
+                        
+                        <p class="font-serif text-lg text-slate-600 dark:text-slate-400 italic leading-relaxed line-clamp-3 mb-6">
+                            ${poem.preview}
+                        </p>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-white/10 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-xs uppercase tracking-widest font-sans">Read Poem</span>
+                            <i class="fas ${theme.icon} text-sm transform -translate-x-2 group-hover:translate-x-0 transition-transform duration-300 ${theme.accentClass}"></i>
+                        </div>
+                    </div>
+                </article>
+            `}).join('');
+        };
+
+        // --- GSAP Animations ---
+
+        const initAnimations = () => {
+            gsap.registerPlugin(ScrollTrigger);
+        };
+
+        const triggerHeroAnimations = () => {
+            const tl = gsap.timeline();
+            tl.to('.animate-gsap-hero', { y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: 'power3.out' })
+              .to('.animate-gsap-hero-line', { scaleX: 1, opacity: 1, duration: 1, ease: 'expo.out' }, "-=0.8")
+              .to('.animate-gsap-scroll', { opacity: 0.7, y: 0, duration: 1, delay: 0.5 });
+
+            initScrollAnimations();
+        };
+
+        const initScrollAnimations = () => {
+            const cards = document.querySelectorAll('.poem-card');
+            cards.forEach((card) => {
+                const category = card.getAttribute('data-category');
+                let fromVars = { opacity: 0, y: 50 };
+                let toVars = { opacity: 1, y: 0, duration: 1, ease: 'power3.out' };
+
+                switch(category) {
+                    case 'Love':
+                        fromVars = { opacity: 0, scale: 0.9, y: 20 };
+                        toVars = { opacity: 1, scale: 1, y: 0, duration: 1.2, ease: 'back.out(1.5)' };
+                        break;
+                    case 'Nature':
+                        fromVars = { opacity: 0, y: 60, rotation: 2 };
+                        toVars = { opacity: 1, y: 0, rotation: 0, duration: 1.4, ease: 'power2.out' };
+                        break;
+                    case 'Dreams':
+                        fromVars = { opacity: 0, y: 30, filter: 'blur(10px)' };
+                        toVars = { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'sine.out' };
+                        break;
+                    case 'Reflection':
+                    case 'Reflective':
+                        fromVars = { opacity: 0, scale: 0.95, filter: 'grayscale(100%)' };
+                        toVars = { opacity: 1, scale: 1, filter: 'grayscale(0%)', duration: 1.5, ease: 'power2.inOut' };
+                        break;
+                    case 'Longing':
+                        fromVars = { opacity: 0, x: -40 };
+                        toVars = { opacity: 1, x: 0, duration: 1.3, ease: 'power2.out' };
+                        break;
+                }
+
+                gsap.fromTo(card, fromVars, {
+                    ...toVars,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    }
+                });
+            });
+        };
+
+        // --- Interaction Logic ---
+
+        window.handleCardEnter = (card, glowRgb) => {
+            gsap.to(card, { scale: 1.03, boxShadow: `0 20px 50px -10px rgba(${glowRgb}, 0.3)`, duration: 0.4, ease: 'power2.out' });
+            gsap.to(card.querySelector('.card-glow'), { opacity: 1, duration: 0.3 });
+        };
+
+        window.handleCardTilt = (e, card, glowRgb) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -5;
+            const rotateY = ((x - centerX) / centerX) * 5;
+            gsap.to(card, { rotateX: rotateX, rotateY: rotateY, transformPerspective: 1000, duration: 0.1, ease: 'none' });
+        };
+
+        window.handleCardLeave = (card) => {
+            gsap.to(card, { scale: 1, rotateX: 0, rotateY: 0, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)', duration: 0.6, ease: 'elastic.out(1, 0.5)' });
+            gsap.to(card.querySelector('.card-glow'), { opacity: 0, duration: 0.3 });
+        };
+
+        // --- Modal & Scene Switching ---
+
+        window.openModal = (index) => {
+            const poem = poems[index];
+            const theme = getTheme(poem.category);
+
+            // Populate Modal
+            document.getElementById('modal-title').innerText = poem.title;
+            document.getElementById('modal-body').innerText = poem.body;
+            document.getElementById('modal-category').innerText = poem.category;
+            document.getElementById('modal-date').innerText = new Date(poem.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            // Style Updates
+            const catBadge = document.getElementById('modal-category');
+            catBadge.className = `px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full transition-colors duration-300 border bg-opacity-20 ${theme.borderClass} ${theme.accentClass} dark:bg-slate-800`;
+            
+            const blob1 = document.getElementById('modal-blob-1');
+            const blob2 = document.getElementById('modal-blob-2');
+            blob1.className = `absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 transition-colors duration-700 ${theme.blobColors[0]}`;
+            blob2.className = `absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2 transition-colors duration-700 ${theme.blobColors[1]}`;
+
+            // Activate Theme
+            if(sceneManager) sceneManager.switchTheme(theme);
+
+            const modal = document.getElementById('poem-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeModal = () => {
+            const modal = document.getElementById('poem-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Revert to default
+            if(sceneManager) sceneManager.switchTheme(categoryThemes['default']);
+        };
+
+        // --- Advanced Scene Manager ---
+
+        class SceneManager {
+            constructor() {
+                this.canvas = document.getElementById('bg-canvas');
+                this.bgLayer = document.getElementById('bg-layer');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.currentTheme = categoryThemes['default'];
+                this.config = this.currentTheme.particleConfig;
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.animate();
+            }
+
+            resize() {
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+                this.initParticles();
+            }
+
+            refreshBackground() {
+                // Apply gradient based on mode
+                const gradient = isDarkMode ? this.currentTheme.gradient.dark : this.currentTheme.gradient.light;
+                this.bgLayer.style.background = gradient;
+            }
+
+            switchTheme(newTheme) {
+                this.currentTheme = newTheme;
+                this.config = newTheme.particleConfig;
+                
+                this.refreshBackground();
+
+                // Transition effect
+                this.canvas.style.opacity = 0;
+                setTimeout(() => {
+                    this.initParticles();
+                    this.canvas.style.opacity = 1;
+                }, 300);
+            }
+
+            initParticles() {
+                this.particles = [];
+                const count = Math.min(this.width * 0.15, this.config.density * 2);
+                for(let i = 0; i < count; i++) {
+                    this.particles.push(new Particle(this.width, this.height, this.config));
+                }
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                // Subtle global movement or camera drift could go here
+                
+                this.particles.forEach(p => {
+                    p.update();
+                    p.draw(this.ctx);
+                });
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        class Particle {
+            constructor(w, h, config) {
+                this.w = w;
+                this.h = h;
+                this.config = config;
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                this.x = Math.random() * this.w;
+                this.y = initial ? Math.random() * this.h : (this.config.type === 'heart' ? this.h + 20 : -20);
+                if (this.config.type === 'star') this.y = Math.random() * this.h; // Stars stay in place roughly
+                
+                // Depth factor (0.5 to 1.5)
+                this.z = Math.random() * 1 + 0.5; 
+                this.size = (Math.random() * 3 + 1) * this.z;
+                
+                this.color = this.config.colors[Math.floor(Math.random() * this.config.colors.length)];
+                this.opacity = (Math.random() * 0.5 + 0.2) * (isDarkMode ? 0.8 : 0.6);
+                
+                const speedMult = this.config.speed * this.z;
+                this.vx = (Math.random() - 0.5) * speedMult;
+                this.vy = (Math.random() - 0.5) * speedMult;
+                
+                // Specialized Physics
+                if(this.config.type === 'leaf') {
+                    this.vy = (Math.random() * 1 + 0.5) * speedMult; 
+                    this.vx = (Math.random() * 2 - 1) * speedMult + 0.5; // Drift right
+                    this.rotation = Math.random() * 360;
+                    this.rotationSpeed = (Math.random() - 0.5) * 2;
+                } else if (this.config.type === 'heart') {
+                    this.vy = -(Math.random() * 1 + 0.5) * speedMult; // Up
+                    this.vx = Math.sin(Math.random() * Math.PI * 2) * 0.5; // Wobble later
+                } else if (this.config.type === 'mist') {
+                    this.vx = (Math.random() - 0.5) * 0.3;
+                    this.vy = (Math.random() - 0.5) * 0.1;
+                } else if (this.config.type === 'star') {
+                    this.vx = (Math.random() - 0.5) * 0.05;
+                    this.vy = (Math.random() - 0.5) * 0.05;
+                    this.pulseSpeed = Math.random() * 0.02 + 0.01;
+                    this.pulse = Math.random() * Math.PI;
+                } else if (this.config.type === 'fragment') {
+                    this.vy = (Math.random() * 0.5 + 0.2) * speedMult; // Slow fall
+                    this.rotation = Math.random() * 360;
+                    this.rotationSpeed = (Math.random() - 0.5) * 0.5;
+                }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Heart wobble
+                if (this.config.type === 'heart') {
+                    this.x += Math.sin(this.y * 0.05) * 0.2;
+                }
+
+                // Star Pulse
+                if (this.config.type === 'star') {
+                    this.pulse += this.pulseSpeed;
+                    this.opacity = (Math.sin(this.pulse) * 0.2 + 0.6) * (isDarkMode ? 0.8 : 0.5);
+                }
+
+                if (this.config.type === 'leaf' || this.config.type === 'fragment') {
+                    this.rotation += this.rotationSpeed;
+                }
+
+                // Boundaries & Reset
+                if (this.y < -50 || this.y > this.h + 50 || this.x < -50 || this.x > this.w + 50) {
+                    this.reset();
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.translate(this.x, this.y);
+
+                if (this.config.type === 'leaf') {
+                    ctx.rotate((this.rotation * Math.PI) / 180);
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, this.size * 2, this.size, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (this.config.type === 'heart') {
+                    const s = this.size * 0.8;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.bezierCurveTo(-s, -s, -s*2, s/2, 0, s*2);
+                    ctx.bezierCurveTo(s*2, s/2, s, -s, 0, 0);
+                    ctx.fill();
+                } else if (this.config.type === 'star') {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.8, 0, Math.PI * 2);
+                    ctx.shadowBlur = 10 * this.z;
+                    ctx.shadowColor = this.color;
+                    ctx.fill();
+                } else if (this.config.type === 'fragment') {
+                    ctx.rotate((this.rotation * Math.PI) / 180);
+                    ctx.beginPath();
+                    ctx.rect(-this.size/2, -this.size/2, this.size, this.size);
+                    ctx.fill();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        // --- Custom Cursor ---
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        const hoverElements = 'a, button, .poem-card';
+        document.body.addEventListener('mouseover', (e) => {
+            if(e.target.closest(hoverElements)) {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                cursor.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            }
+        });
+        document.body.addEventListener('mouseout', (e) => {
+            if(e.target.closest(hoverElements)) {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursor.style.backgroundColor = 'transparent';
+            }
+        });
+
+        // Event Listeners
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        document.getElementById('close-modal').addEventListener('click', closeModal);
+        document.getElementById('poem-modal').addEventListener('click', (e) => {
+            if(e.target === document.getElementById('poem-modal')) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') closeModal();
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

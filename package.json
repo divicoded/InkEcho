@@ -1,0 +1,36 @@
+{
+  "name": "ink-echo",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "InkEcho - a cinematic, mood-adaptive poetry anthology. Where ink becomes voice, and voice becomes echo.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.114.0",
+    "@react-three/fiber": "^8.17.10",
+    "animejs": "^3.2.2",
+    "framer-motion": "11.11.17",
+    "gsap": "^3.12.5",
+    "lenis": "^1.3.25",
+    "lucide-react": "^0.454.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "@types/animejs": "^3.1.12",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "0.169.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}

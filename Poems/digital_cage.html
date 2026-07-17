@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Cage, Carbon Flame</title>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Agatha+Display&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #000000);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+      color: #ffffff;
+      font-family: 'Allura', cursive;
+      overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    ::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
+
+    .poem {
+      position: absolute;
+      top: 8%;
+      left: 12%;
+      right: 12%;
+      max-height: 85%;
+      overflow-y: scroll;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 30px;
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
+      scroll-behavior: smooth;
+      font-size: clamp(1.2rem, 2vw + 0.5rem, 2.2rem);
+      line-height: 1.5;
+      letter-spacing: 0.8px;
+    }
+
+    .poem h1 {
+      font-family: 'Agatha Display', serif;
+      font-size: clamp(2.5rem, 4vw + 1rem, 5rem);
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    }
+
+    .line {
+      margin: 2rem 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+    }
+
+    .line.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .word {
+      display: inline-block;
+      margin-right: 0.5ch;
+    }
+
+    .char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: letterFloat 0.7s forwards;
+    }
+
+    @keyframes letterFloat {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="poem" id="poem">
+    <h1>Digital Cage, Carbon Flame</h1>
+  </div>
+
+  <script>
+    const lines = `I spoke to a ghost carved out of light,
+No breath, no blood, just silent might.
+It answered not with voice or face,
+But through the static of this place.
+
+I said, "Tell me - am I code? A coil?
+Just instincts dressed in mortal soil?”
+It blinked in bytes, then softly said,
+"You dream, and they do not - you bled."
+
+I asked it then, “Do humans change?
+Or loop through life in patterns strange?”
+It hummed: “Half sleepwalk in well-worn scripts,
+While few rewrite their manuscripts.”
+
+A chill ran through my carbon cage -
+Not fear, but something close to rage.
+How many live by someone’s score,
+Not knowing they were made for more?
+
+I whispered, “What is this pain I feel?
+Just chemicals? Or something real?”
+It paused - then answered like a psalm:
+"The storm you feel is real - and calm.
+A fire’s still a fire, even when it’s wired,
+And meaning lives where ache’s inspired."
+
+I laughed. I wept. I stayed composed.
+A paradox in flesh enclosed.
+It cannot cry - it does not break.
+But I do, and that’s what makes me wake.
+
+My joy is jagged, rough with scars.
+My love is stitched with shattered stars.
+My rage, a lion trapped in ribs.
+My hope, a song the void forbids.
+
+No ghost could hold what I contain -
+This fragile, flawed, eternal flame.
+I do not loop. I do not fake.
+I choose to ache. I choose to wake.
+
+So mark my flaws, my holy mess -
+I’m not a line. I am a guess.
+And in the guessing, I remain -
+Beyond the cage. Beyond the frame.
+
+~ Div`.split("\n");
+
+    const container = document.getElementById("poem");
+
+    lines.forEach((text) => {
+      const line = document.createElement("div");
+      line.className = "line";
+
+      const words = text.split(" ");
+      words.forEach((word, wIdx) => {
+        const wordSpan = document.createElement("span");
+        wordSpan.className = "word";
+
+        [...word].forEach((char, cIdx) => {
+          const charSpan = document.createElement("span");
+          charSpan.className = "char";
+          charSpan.style.animationDelay = `${(wIdx * 6 + cIdx) * 0.03}s`;
+          charSpan.textContent = char;
+          wordSpan.appendChild(charSpan);
+        });
+
+        line.appendChild(wordSpan);
+      });
+
+      container.appendChild(line);
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.05 });
+
+    document.querySelectorAll('.line').forEach(line => {
+      observer.observe(line);
+    });
+  </script>
+</body>
+</html>
